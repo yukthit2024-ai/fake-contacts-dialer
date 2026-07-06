@@ -20,6 +20,7 @@ public class DialingActivity extends AppCompatActivity {
     private Handler handler = new Handler();
     private Runnable transitionRunnable;
     private android.media.MediaPlayer ringtonePlayer;
+    private RealCallVolumeHelper realCallVolumeHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +34,10 @@ public class DialingActivity extends AppCompatActivity {
         }
 
         setupUI();
+        
+        realCallVolumeHelper = new RealCallVolumeHelper(this);
+        realCallVolumeHelper.register();
+        
         startRingingSimulation();
         setupCameraPreview();
         playRingtone();
@@ -55,6 +60,7 @@ public class DialingActivity extends AppCompatActivity {
                 ringtonePlayer.setDataSource(this, ringtoneUri);
                 ringtonePlayer.setLooping(true);
                 ringtonePlayer.prepare();
+                realCallVolumeHelper.bindMediaPlayer(ringtonePlayer);
                 ringtonePlayer.start();
             } catch (Exception e) {
                 android.util.Log.e("DialingActivity", "Error playing ringtone", e);
@@ -144,6 +150,9 @@ public class DialingActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (realCallVolumeHelper != null) {
+            realCallVolumeHelper.unregister();
+        }
         stopSimulation();
     }
 

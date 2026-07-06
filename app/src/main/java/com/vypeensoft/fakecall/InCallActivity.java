@@ -26,6 +26,7 @@ public class InCallActivity extends AppCompatActivity {
     private boolean isKeypadOpen = false;
     private boolean isHoldActive = false;
     private boolean isVideoActive = false;
+    private RealCallVolumeHelper realCallVolumeHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +40,11 @@ public class InCallActivity extends AppCompatActivity {
         }
 
         audioPlayerHelper = new AudioPlayerHelper();
+        
+        realCallVolumeHelper = new RealCallVolumeHelper(this);
+        realCallVolumeHelper.bindAudioPlayerHelper(audioPlayerHelper);
+        realCallVolumeHelper.register();
+        
         setupUI();
         startCall();
         setupCameraPreview();
@@ -186,6 +192,9 @@ public class InCallActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (realCallVolumeHelper != null) {
+            realCallVolumeHelper.unregister();
+        }
         if (audioPlayerHelper != null) {
             audioPlayerHelper.stopAudio();
         }

@@ -45,4 +45,13 @@ public class AudioPlayerHelper {
             mediaPlayer = null;
         }
     }
+    public void setVolume(float volume) {
+        if (mediaPlayer != null) {
+            try {
+                mediaPlayer.setVolume(volume, volume);
+            } catch (Exception e) {
+                Log.e(TAG, "Error setting volume", e);
+            }
+        }
+    }
 }

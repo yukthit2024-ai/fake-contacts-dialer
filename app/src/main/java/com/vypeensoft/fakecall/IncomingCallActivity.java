@@ -25,6 +25,7 @@ public class IncomingCallActivity extends AppCompatActivity {
     private MediaPlayer ringtonePlayer;
     private Handler handler = new Handler();
     private Runnable timeoutRunnable;
+    private RealCallVolumeHelper realCallVolumeHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +39,10 @@ public class IncomingCallActivity extends AppCompatActivity {
         }
 
         setupUI();
+        
+        realCallVolumeHelper = new RealCallVolumeHelper(this);
+        realCallVolumeHelper.register();
+        
         playRingtone();
         setupTimeout();
     }
@@ -74,6 +79,7 @@ public class IncomingCallActivity extends AppCompatActivity {
                 ringtonePlayer.setDataSource(this, ringtoneUri);
                 ringtonePlayer.setLooping(true);
                 ringtonePlayer.prepare();
+                realCallVolumeHelper.bindMediaPlayer(ringtonePlayer);
                 ringtonePlayer.start();
             } catch (Exception e) {
                 Log.e(TAG, "Error playing ringtone", e);
@@ -137,6 +143,9 @@ public class IncomingCallActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (realCallVolumeHelper != null) {
+            realCallVolumeHelper.unregister();
+        }
         cancelTimeout();
         stopRingtone();
     }
